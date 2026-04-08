@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import type { Alumno } from "@/types";
+import { AvatarSeguro } from "./AvatarSeguro";
 
 interface VistaContactoProps {
   alumno: Alumno;
@@ -18,22 +18,7 @@ export function VistaContacto({ alumno, onEditar, onVolver }: VistaContactoProps
 
       {/* Encabezado alumno */}
       <div className="flex items-center gap-4">
-        {alumno.fotoUrl ? (
-          <Image
-            src={alumno.fotoUrl}
-            alt={alumno.nombreCompleto}
-            width={64}
-            height={64}
-            className="w-16 h-16 rounded-full object-cover border border-white/20 flex-shrink-0"
-          />
-        ) : (
-          <div className="w-16 h-16 rounded-full bg-white/10 border border-white/20 flex items-center justify-center flex-shrink-0">
-            <svg className="w-8 h-8 text-white/30" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
-            </svg>
-          </div>
-        )}
-        <div>
+        <AvatarSeguro fotoUrl={alumno.fotoUrl} nombre={alumno.nombreCompleto} />
           <h2 className="text-lg font-semibold text-white">{alumno.nombreCompleto}</h2>
           <p className="text-sm text-white/60">{alumno.grado} — {turnoLabel}</p>
         </div>
