@@ -1,13 +1,8 @@
-"use client";
-
-import { useState, useRef } from "react";
-import Image from "next/image";
+import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { actualizarContacto } from "@/lib/firestore";
-import { subirFotoAlumno } from "@/lib/storage";
 import { toast } from "react-hot-toast";
-import { Camera } from "lucide-react";
 import type { Alumno } from "@/types";
 
 interface FormularioContactoProps {
@@ -22,9 +17,6 @@ export function FormularioContacto({
   onCancelar,
 }: FormularioContactoProps) {
   const [loading, setLoading] = useState(false);
-  const [foto, setFoto] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(alumno.fotoUrl ?? null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({
     nombreContacto1: alumno.nombreContacto1 ?? "",
@@ -45,14 +37,6 @@ export function FormularioContacto({
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
-  function handleFotoChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0] ?? null;
-    setFoto(file);
-    if (file) {
-      setPreviewUrl(URL.createObjectURL(file));
-    }
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!form.nombreContacto1 || !form.telefono1) {
@@ -61,14 +45,9 @@ export function FormularioContacto({
     }
     setLoading(true);
     try {
-      let fotoUrl = alumno.fotoUrl;
-      if (foto) {
-        fotoUrl = await subirFotoAlumno(alumno.id, foto);
-      }
-      const datos: Partial<typeof form & { fotoUrl?: string }> = { ...form, ...(fotoUrl ? { fotoUrl } : {}) };
-      await actualizarContacto(alumno.id, datos);
+      await actualizarContacto(alumno.id, form);
       toast.success("Datos guardados");
-      onGuardado({ ...alumno, ...datos });
+      onGuardado({ ...alumno, ...form });
     } catch {
       toast.error("Error al guardar");
     } finally {
@@ -83,178 +62,45 @@ export function FormularioContacto({
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <p className="text-sm font-semibold text-white">{alumno.nombreCompleto}</p>
 
-      {/* Foto */}
-      <div className="flex flex-col items-center gap-3">
-        <div className="w-24 h-24 rounded-full overflow-hidden bg-white/10 border border-white/20 flex items-center justify-center">
-          {previewUrl ? (
-            <Image
-              src={previewUrl}
-              alt="Foto del alumno"
-              width={96}
-              height={96}
-              className="w-full h-full object-cover"
-              unoptimized={previewUrl.startsWith("blob:")}
-            />
-          ) : (
-            <svg className="w-12 h-12 text-white/30" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
-            </svg>
-          )}
-        </div>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          aria-label="Foto del alumno"
-          onChange={handleFotoChange}
-          className="hidden"
-        />
-        <Button
-          type="button"
-          variant="secondary"
-          className="flex items-center gap-2 text-sm"
-          onClick={() => fileInputRef.current?.click()}
-        >
-          <Camera size={15} />
-          {previewUrl ? "Cambiar foto" : "Agregar foto"}
-        </Button>
-      </div>
-
       <fieldset className="border border-white/20 rounded-lg p-4">
         <legend className="text-xs font-semibold px-2 text-white/50">Contacto 1 *</legend>
         <div className="flex flex-col gap-3">
-          <Input
-            label="Nombre"
-            name="nombreContacto1"
-            value={form.nombreContacto1}
-            onChange={handleChange}
-            required
-            className={inputClass}
-            labelClassName={labelClass}
-          />
-          <Input
-            label="Relación"
-            name="relacionContacto1"
-            value={form.relacionContacto1}
-            onChange={handleChange}
-            placeholder="Mamá, Papá, Tutor..."
-            className={inputClass}
-            labelClassName={labelClass}
-          />
-          <Input
-            label="Teléfono"
-            name="telefono1"
-            value={form.telefono1}
-            onChange={handleChange}
-            required
-            className={inputClass}
-            labelClassName={labelClass}
-          />
+          <Input label="Nombre" name="nombreContacto1" value={form.nombreContacto1} onChange={handleChange} required className={inputClass} labelClassName={labelClass} />
+          <Input label="Relación" name="relacionContacto1" value={form.relacionContacto1} onChange={handleChange} placeholder="Mamá, Papá, Tutor..." className={inputClass} labelClassName={labelClass} />
+          <Input label="Teléfono" name="telefono1" value={form.telefono1} onChange={handleChange} required className={inputClass} labelClassName={labelClass} />
         </div>
       </fieldset>
 
       <fieldset className="border border-white/20 rounded-lg p-4">
-        <legend className="text-xs font-semibold px-2 text-white/50">
-          Contacto 2 (opcional)
-        </legend>
+        <legend className="text-xs font-semibold px-2 text-white/50">Contacto 2 (opcional)</legend>
         <div className="flex flex-col gap-3">
-          <Input
-            label="Nombre"
-            name="nombreContacto2"
-            value={form.nombreContacto2}
-            onChange={handleChange}
-            className={inputClass}
-            labelClassName={labelClass}
-          />
-          <Input
-            label="Relación"
-            name="relacionContacto2"
-            value={form.relacionContacto2}
-            onChange={handleChange}
-            placeholder="Mamá, Papá, Tutor..."
-            className={inputClass}
-            labelClassName={labelClass}
-          />
-          <Input
-            label="Teléfono"
-            name="telefono2"
-            value={form.telefono2}
-            onChange={handleChange}
-            className={inputClass}
-            labelClassName={labelClass}
-          />
+          <Input label="Nombre" name="nombreContacto2" value={form.nombreContacto2} onChange={handleChange} className={inputClass} labelClassName={labelClass} />
+          <Input label="Relación" name="relacionContacto2" value={form.relacionContacto2} onChange={handleChange} placeholder="Mamá, Papá, Tutor..." className={inputClass} labelClassName={labelClass} />
+          <Input label="Teléfono" name="telefono2" value={form.telefono2} onChange={handleChange} className={inputClass} labelClassName={labelClass} />
         </div>
       </fieldset>
 
       <fieldset className="border border-white/20 rounded-lg p-4">
-        <legend className="text-xs font-semibold px-2 text-white/50">
-          Contacto 3 (opcional)
-        </legend>
+        <legend className="text-xs font-semibold px-2 text-white/50">Contacto 3 (opcional)</legend>
         <div className="flex flex-col gap-3">
-          <Input
-            label="Nombre"
-            name="nombreContacto3"
-            value={form.nombreContacto3}
-            onChange={handleChange}
-            className={inputClass}
-            labelClassName={labelClass}
-          />
-          <Input
-            label="Teléfono"
-            name="telefono3"
-            value={form.telefono3}
-            onChange={handleChange}
-            className={inputClass}
-            labelClassName={labelClass}
-          />
+          <Input label="Nombre" name="nombreContacto3" value={form.nombreContacto3} onChange={handleChange} className={inputClass} labelClassName={labelClass} />
+          <Input label="Teléfono" name="telefono3" value={form.telefono3} onChange={handleChange} className={inputClass} labelClassName={labelClass} />
         </div>
       </fieldset>
 
       <fieldset className="border border-white/20 rounded-lg p-4">
-        <legend className="text-xs font-semibold px-2 text-white/50">
-          Contacto 4 (opcional)
-        </legend>
+        <legend className="text-xs font-semibold px-2 text-white/50">Contacto 4 (opcional)</legend>
         <div className="flex flex-col gap-3">
-          <Input
-            label="Nombre"
-            name="nombreContacto4"
-            value={form.nombreContacto4}
-            onChange={handleChange}
-            className={inputClass}
-            labelClassName={labelClass}
-          />
-          <Input
-            label="Teléfono"
-            name="telefono4"
-            value={form.telefono4}
-            onChange={handleChange}
-            className={inputClass}
-            labelClassName={labelClass}
-          />
+          <Input label="Nombre" name="nombreContacto4" value={form.nombreContacto4} onChange={handleChange} className={inputClass} labelClassName={labelClass} />
+          <Input label="Teléfono" name="telefono4" value={form.telefono4} onChange={handleChange} className={inputClass} labelClassName={labelClass} />
         </div>
       </fieldset>
 
       <fieldset className="border border-white/20 rounded-lg p-4">
-        <legend className="text-xs font-semibold px-2 text-white/50">
-          Contacto 5 (opcional)
-        </legend>
+        <legend className="text-xs font-semibold px-2 text-white/50">Contacto 5 (opcional)</legend>
         <div className="flex flex-col gap-3">
-          <Input
-            label="Nombre"
-            name="nombreContacto5"
-            value={form.nombreContacto5}
-            onChange={handleChange}
-            className={inputClass}
-            labelClassName={labelClass}
-          />
-          <Input
-            label="Teléfono"
-            name="telefono5"
-            value={form.telefono5}
-            onChange={handleChange}
-            className={inputClass}
-            labelClassName={labelClass}
-          />
+          <Input label="Nombre" name="nombreContacto5" value={form.nombreContacto5} onChange={handleChange} className={inputClass} labelClassName={labelClass} />
+          <Input label="Teléfono" name="telefono5" value={form.telefono5} onChange={handleChange} className={inputClass} labelClassName={labelClass} />
         </div>
       </fieldset>
 
