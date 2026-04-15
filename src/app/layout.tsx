@@ -71,7 +71,7 @@ export default function RootLayout({
 
               {/* YouTube */}
               <div className="social-group">
-                <h6>YouTube</h6>
+               <h6>YouTube<br />&nbsp;</h6>
                 <a
                   href="https://www.youtube.com/@CEFSanFrancisco"
                   target="_blank"
