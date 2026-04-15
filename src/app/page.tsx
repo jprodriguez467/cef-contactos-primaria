@@ -64,12 +64,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Pie de página */}
-      <footer className="w-full text-center pb-6 px-4">
-        <p className="text-white/50 text-xs italic">
-          © 2025 Rodriguez Juan Pablo — Todos los derechos reservados
-        </p>
-      </footer>
+   
 
       <MusicPlayer src="/moodmode-no-copyright-music-201745.mp3" />
     </main>
