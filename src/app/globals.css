@@ -24,3 +24,75 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ── FOOTER ── */
+footer.pie {
+  background-color: #1a1a2e;
+  color: #ffffff;
+  padding: 2rem 1rem 1.5rem;
+  margin-top: auto;
+}
+
+footer.pie .text-center {
+  text-align: center;
+}
+
+footer.pie h5.cont {
+  font-size: 1.3rem;
+  letter-spacing: 1px;
+  margin-bottom: 1.2rem;
+  color: #f0c040;
+  text-transform: uppercase;
+}
+
+.social-section {
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.social-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.social-group h6 {
+  font-size: 0.78rem;
+  color: #cccccc;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.social-group a {
+  font-size: 1.8rem;
+  transition: transform 0.2s, color 0.2s;
+  text-decoration: none;
+}
+
+.social-group a:hover {
+  transform: scale(1.2);
+}
+
+.whatsapp-link  { color: #25d366; }
+.instagram-link { color: #e1306c; }
+.youtube-link   { color: #ff0000; }
+
+.copyright-container {
+  border-top: 1px solid #333;
+  padding-top: 1rem;
+  margin-top: 0.5rem;
+}
+
+.copyright {
+  font-size: 0.82rem;
+  color: #aaaaaa;
+}
+
+.jpr-cursiva {
+  font-style: italic;
+  color: #f0c040;
+}
