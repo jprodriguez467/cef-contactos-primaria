@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Centro Educativo Franciscano</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      main {
+        flex: 1;
+      }
+
+      /* ── FOOTER ── */
+      footer.pie {
+        background-color: #1a1a2e;
+        color: #ffffff;
+        padding: 2rem 1rem 1.5rem;
+        margin-top: auto;
+      }
+
+      footer.pie .text-center {
+        text-align: center;
+      }
+
+      footer.pie h5.cont {
+        font-size: 1.3rem;
+        letter-spacing: 1px;
+        margin-bottom: 1.2rem;
+        color: #f0c040;
+        text-transform: uppercase;
+      }
+
+      .social-section {
+        display: flex;
+        justify-content: center;
+        gap: 2.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+      }
+
+      .social-group {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .social-group h6 {
+        font-size: 0.78rem;
+        color: #cccccc;
+        text-align: center;
+        line-height: 1.4;
+      }
+
+      .social-group a {
+        font-size: 1.8rem;
+        transition: transform 0.2s, color 0.2s;
+        text-decoration: none;
+      }
+
+      .social-group a:hover {
+        transform: scale(1.2);
+      }
+
+      .whatsapp-link  { color: #25d366; }
+      .instagram-link { color: #e1306c; }
+      .youtube-link   { color: #ff0000; }
+
+      .copyright-container {
+        border-top: 1px solid #333;
+        padding-top: 1rem;
+        margin-top: 0.5rem;
+      }
+
+      .copyright {
+        font-size: 0.82rem;
+        color: #aaaaaa;
+      }
+
+      .jpr-cursiva {
+        font-style: italic;
+        color: #f0c040;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <!-- Tu contenido principal va aquí -->
+    </main>
+
+    <footer class="pie">
+      <div class="text-center">
+        <h5 class="cont">Contáctanos</h5>
+        <div class="social-section">
+
+          <!-- WhatsApp Nivel Primario -->
+          <div class="social-group">
+            <h6>Nivel <br />Inicial-Primario</h6>
+            <a
+              href="https://api.whatsapp.com/send?phone=5493425135795&text=Hola, Bienvenido/a al C.E.F. del nivel PRIMARIO, en que te puedo ayudar."
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-white whatsapp-link"
+              aria-label="WhatsApp Nivel Primario"
+            >
+              <i class="fab fa-whatsapp"></i>
+            </a>
+          </div>
+
+          <!-- Instagram Niveles Inicial y Primario -->
+          <div class="social-group">
+            <h6>Niveles<br />Inicial-Primario</h6>
+            <a
+              href="https://www.instagram.com/escuelasanfrancisco1001sf?igsh=OTllaTZ6eTRkMGI0&utm_source=qr"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-white instagram-link"
+              aria-label="Instagram Nivel Primario"
+            >
+              <i class="fab fa-instagram"></i>
+            </a>
+          </div>
+
+          <!-- YouTube -->
+          <div class="social-group">
+            <h6>YouTube</h6>
+            <a
+              href="https://www.youtube.com/@CEFSanFrancisco"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-white youtube-link"
+              aria-label="YouTube"
+            >
+              <i class="fab fa-youtube"></i>
+            </a>
+          </div>
+
+        </div>
+
+        <!-- Copyright -->
+        <div class="copyright-container">
+          <p class="copyright">
+            © Copyright 2025
+            <span class="jpr-cursiva">Juan Pablo, Rodríguez.</span>
+          </p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
