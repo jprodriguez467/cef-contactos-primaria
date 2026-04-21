@@ -53,7 +53,7 @@ export default function JuegoPage() {
           </div>
         )}
         <div className="mt-8 text-center">
-          <Link href="/padres" className="inline-block bg-yellow-400 hover:bg-yellow-300 text-yellow-900 font-bold py-3 px-6 rounded-full shadow-lg transition">
+          <Link href="https://cef-contactos-primaria.vercel.app/padres">
             Cargar mis datos y desbloquear palabras
           </Link>
         </div>
