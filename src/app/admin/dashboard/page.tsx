@@ -310,12 +310,16 @@ Esta acción no se puede deshacer.`
             </div>
 
             {/* Botones acciÃ³n */}
-            <div className="flex gap-2 flex-wrap">
-              <Button
-                onClick={() => setMostrarModalAgregar(true)}
-              >
-                + Agregar alumno
-              </Button>
+        <Button
+  onClick={() => setMostrarModalAgregar(true)}
+>
+  + Agregar alumno
+</Button>
+<a href="/admin/frases">
+  <Button variant="secondary">
+    🗝️ Frases del juego
+  </Button>
+</a>
               <Button
                 variant="secondary"
                 onClick={() => { setMostrarLimpiarGrado((v) => !v); setMostrarEliminarGrado(false); }}
