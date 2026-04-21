@@ -1,8 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export function BotonFlotanteJuego() {
+  const pathname = usePathname();
+
+  if (pathname === "/padres/juego") return null;
+
   return (
     <Link
       href="/padres/juego"
