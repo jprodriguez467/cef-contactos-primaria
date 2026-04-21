@@ -23,16 +23,11 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(false);
   const [gradoFiltro, setGradoFiltro] = useState<Grado | "">("");
   const [turnoFiltro, setTurnoFiltro] = useState<Turno | "">("");
-
   const [mostrarModalAgregar, setMostrarModalAgregar] = useState(false);
-
-  // Estado para el panel "Eliminar grado completo"
   const [mostrarEliminarGrado, setMostrarEliminarGrado] = useState(false);
   const [gradoEliminar, setGradoEliminar] = useState<Grado | "">("");
   const [turnoEliminar, setTurnoEliminar] = useState<Turno | "">("");
   const [loadingEliminar, setLoadingEliminar] = useState(false);
-
-  // Estado para el panel "Limpiar contactos del grado"
   const [mostrarLimpiarGrado, setMostrarLimpiarGrado] = useState(false);
   const [gradoLimpiar, setGradoLimpiar] = useState<Grado | "">("");
   const [turnoLimpiar, setTurnoLimpiar] = useState<Turno | "">("");
@@ -67,7 +62,7 @@ export default function AdminDashboardPage() {
   }
 
   async function handleEliminar(id: string) {
-    if (!confirm("Â¿Eliminar este alumno?")) return;
+    if (!confirm("¿Eliminar este alumno?")) return;
     try {
       await eliminarAlumno(id);
       const nuevos = alumnos.filter((a) => a.id !== id);
@@ -80,7 +75,7 @@ export default function AdminDashboardPage() {
   }
 
   async function handleLimpiar(id: string, nombre: string) {
-    if (!confirm(`Â¿Borrar los datos de contacto de ${nombre}? El alumno NO se elimina del listado.`)) return;
+    if (!confirm(`¿Borrar los datos de contacto de ${nombre}? El alumno NO se elimina del listado.`)) return;
     try {
       await limpiarContactos(id);
       const nuevos = alumnos.map((a) =>
@@ -110,25 +105,18 @@ export default function AdminDashboardPage() {
       toast.error("Seleccioná grado y turno");
       return;
     }
-
     const cantidad = limpiarTodos
       ? alumnos.length
       : alumnos.filter((a) => a.grado === gradoLimpiar && a.turno === turnoLimpiar).length;
-
     if (cantidad === 0) {
       toast.error(limpiarTodos ? "No hay alumnos para limpiar" : "No hay alumnos en ese grado/turno");
       return;
     }
-
     const descripcion = limpiarTodos
       ? "todos los alumnos"
       : `${gradoLimpiar} — ${turnoLimpiar === "manana" ? "Mañana" : "Tarde"}`;
-
-    const confirmado = confirm(
-      `¿Limpiar los contactos de ${cantidad} alumno${cantidad !== 1 ? "s" : ""} de ${descripcion}?\n\nLos alumnos NO se eliminan del listado.`
-    );
+    const confirmado = confirm(`¿Limpiar los contactos de ${cantidad} alumno${cantidad !== 1 ? "s" : ""} de ${descripcion}?\n\nLos alumnos NO se eliminan del listado.`);
     if (!confirmado) return;
-
     setLoadingLimpiar(true);
     try {
       let limpiados: number;
@@ -137,7 +125,6 @@ export default function AdminDashboardPage() {
       } else {
         limpiados = await limpiarContactosGrado(gradoLimpiar, turnoLimpiar);
       }
-
       const nuevos = alumnos.map((a) =>
         limpiarTodos || (a.grado === gradoLimpiar && a.turno === turnoLimpiar)
           ? {
@@ -170,27 +157,18 @@ export default function AdminDashboardPage() {
       toast.error("Seleccioná grado y turno");
       return;
     }
-
     const cantidad = eliminarTodos
       ? alumnos.length
       : alumnos.filter((a) => a.grado === gradoEliminar && a.turno === turnoEliminar).length;
-
     if (cantidad === 0) {
       toast.error(eliminarTodos ? "No hay alumnos para eliminar" : "No hay alumnos en ese grado/turno");
       return;
     }
-
     const descripcion = eliminarTodos
       ? "todos los alumnos"
       : `${gradoEliminar} — ${turnoEliminar === "manana" ? "Mañana" : "Tarde"}`;
-
-    const confirmado = confirm(
-      `¿Estás seguro? Se eliminarán ${cantidad} alumno${cantidad !== 1 ? "s" : ""} de ${descripcion}.
-
-Esta acción no se puede deshacer.`
-    );
+    const confirmado = confirm(`¿Estás seguro? Se eliminarán ${cantidad} alumno${cantidad !== 1 ? "s" : ""} de ${descripcion}.\n\nEsta acción no se puede deshacer.`);
     if (!confirmado) return;
-
     setLoadingEliminar(true);
     try {
       if (eliminarTodos) {
@@ -198,7 +176,6 @@ Esta acción no se puede deshacer.`
       } else {
         await eliminarGradoCompleto(gradoEliminar, turnoEliminar);
       }
-
       const nuevos = eliminarTodos
         ? []
         : alumnos.filter((a) => !(a.grado === gradoEliminar && a.turno === turnoEliminar));
@@ -234,7 +211,6 @@ Esta acción no se puede deshacer.`
           </Button>
         </div>
 
-        {/* EstadÃ­sticas */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <Card>
             <p className="text-3xl font-bold text-blue-600">{alumnos.length}</p>
@@ -254,7 +230,6 @@ Esta acción no se puede deshacer.`
           </Card>
         </div>
 
-        {/* Importar */}
         <Card className="mb-6">
           <h2 className="font-semibold text-gray-700 mb-3">Importar alumnos</h2>
           <SubirExcel />
@@ -263,7 +238,6 @@ Esta acción no se puede deshacer.`
           </Button>
         </Card>
 
-        {/* Tabla con filtros */}
         <Card>
           <div className="flex flex-wrap gap-4 mb-4 items-end justify-between">
             <div className="flex flex-wrap gap-4 items-end">
@@ -288,181 +262,66 @@ Esta acción no se puede deshacer.`
                 </select>
               </div>
               <div>
-                <label htmlFor="filtro-turno" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="filtro-turno"
+                 className="block text-sm font-medium text-gray-700 mb-1">
                   Filtrar por turno
                 </label>
-                <select
-                  id="filtro-turno"
-                  value={turnoFiltro}
-                  onChange={(e) => {
-                    const t = e.target.value as Turno | "";
-                    setTurnoFiltro(t);
-                    aplicarFiltros(gradoFiltro, t, alumnos);
-                  }}
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
-                >
+                <select id="filtro-turno" value={turnoFiltro} onChange={(e) => { const t = e.target.value as Turno | ""; setTurnoFiltro(t); aplicarFiltros(gradoFiltro, t, alumnos); }} className="border border-gray-300 rounded-lg px-3 py-2 text-sm">
                   <option value="">Todos</option>
-                  {TURNOS.map((t) => (
-                    <option key={t.value} value={t.value}>{t.label}</option>
-                  ))}
+                  {TURNOS.map((t) => (<option key={t.value} value={t.value}>{t.label}</option>))}
                 </select>
               </div>
             </div>
-
-            {/* Botones acciÃ³n */}
-        <Button
-  onClick={() => setMostrarModalAgregar(true)}
->
-  + Agregar alumno
-</Button>
-<a href="/admin/frases">
-  <Button variant="secondary">
-    🗝️ Frases del juego
-  </Button>
-</a>
-              <Button
-                variant="secondary"
-                onClick={() => { setMostrarLimpiarGrado((v) => !v); setMostrarEliminarGrado(false); }}
-              >
-                Limpiar contactos del grado
-              </Button>
-              <Button
-                variant="danger"
-                onClick={() => { setMostrarEliminarGrado((v) => !v); setMostrarLimpiarGrado(false); }}
-              >
-                Eliminar grado completo
-              </Button>
+            <div className="flex gap-2 flex-wrap">
+              <Button onClick={() => setMostrarModalAgregar(true)}>+ Agregar alumno</Button>
+            <button onClick={() => window.location.href='/admin/frases'} className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">Frases del juego</button>
+              <Button variant="secondary" onClick={() => { setMostrarLimpiarGrado((v) => !v); setMostrarEliminarGrado(false); }}>Limpiar contactos del grado</Button>
+              <Button variant="danger" onClick={() => { setMostrarEliminarGrado((v) => !v); setMostrarLimpiarGrado(false); }}>Eliminar grado completo</Button>
             </div>
           </div>
 
-          {/* Panel limpiar contactos del grado */}
           {mostrarLimpiarGrado && (
             <div className="mb-4 p-4 border border-yellow-200 bg-yellow-50 rounded-lg flex flex-wrap gap-4 items-end">
               <div>
-                <label htmlFor="limpiar-grado" className="block text-sm font-medium text-yellow-800 mb-1">
-                  Grado
-                </label>
-                <select
-                  id="limpiar-grado"
-                  value={gradoLimpiar}
-                  onChange={(e) => setGradoLimpiar(e.target.value as Grado)}
-                  className="border border-yellow-300 rounded-lg px-3 py-2 text-sm"
-                >
+                <label htmlFor="limpiar-grado" className="block text-sm font-medium text-yellow-800 mb-1">Grado</label>
+                <select id="limpiar-grado" value={gradoLimpiar} onChange={(e) => setGradoLimpiar(e.target.value as Grado)} className="border border-yellow-300 rounded-lg px-3 py-2 text-sm">
                   <option value="">Todos</option>
-                  {GRADOS.map((g) => (
-                    <option key={g} value={g}>{g}</option>
-                  ))}
+                  {GRADOS.map((g) => (<option key={g} value={g}>{g}</option>))}
                 </select>
               </div>
               <div>
-                <label htmlFor="limpiar-turno" className="block text-sm font-medium text-yellow-800 mb-1">
-                  Turno
-                </label>
-                <select
-                  id="limpiar-turno"
-                  value={turnoLimpiar}
-                  onChange={(e) => setTurnoLimpiar(e.target.value as Turno)}
-                  className="border border-yellow-300 rounded-lg px-3 py-2 text-sm"
-                >
+                <label htmlFor="limpiar-turno" className="block text-sm font-medium text-yellow-800 mb-1">Turno</label>
+                <select id="limpiar-turno" value={turnoLimpiar} onChange={(e) => setTurnoLimpiar(e.target.value as Turno)} className="border border-yellow-300 rounded-lg px-3 py-2 text-sm">
                   <option value="">Todos</option>
-                  {TURNOS.map((t) => (
-                    <option key={t.value} value={t.value}>{t.label}</option>
-                  ))}
+                  {TURNOS.map((t) => (<option key={t.value} value={t.value}>{t.label}</option>))}
                 </select>
               </div>
-              {(gradoLimpiar || turnoLimpiar) && (
-                <p className="text-sm text-yellow-700 self-center">
-                  {gradoLimpiar === ""
-                    ? alumnos.length
-                    : alumnos.filter(
-                        (a) => a.grado === gradoLimpiar && a.turno === turnoLimpiar
-                      ).length}{" "}
-                  alumno(s) â€” solo se borran los contactos
-                </p>
-              )}
               <div className="flex gap-2">
-                <Button
-                  variant="secondary"
-                  loading={loadingLimpiar}
-                  onClick={handleLimpiarGrado}
-                >
-                  Confirmar limpieza
-                </Button>
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    setMostrarLimpiarGrado(false);
-                    setGradoLimpiar("");
-                    setTurnoLimpiar("");
-                  }}
-                >
-                  Cancelar
-                </Button>
+                <Button variant="secondary" loading={loadingLimpiar} onClick={handleLimpiarGrado}>Confirmar limpieza</Button>
+                <Button variant="secondary" onClick={() => { setMostrarLimpiarGrado(false); setGradoLimpiar(""); setTurnoLimpiar(""); }}>Cancelar</Button>
               </div>
             </div>
           )}
 
-          {/* Panel eliminar grado completo */}
           {mostrarEliminarGrado && (
             <div className="mb-4 p-4 border border-red-200 bg-red-50 rounded-lg flex flex-wrap gap-4 items-end">
               <div>
-                <label htmlFor="eliminar-grado" className="block text-sm font-medium text-red-700 mb-1">
-                  Grado
-                </label>
-                <select
-                  id="eliminar-grado"
-                  value={gradoEliminar}
-                  onChange={(e) => setGradoEliminar(e.target.value as Grado)}
-                  className="border border-red-300 rounded-lg px-3 py-2 text-sm"
-                >
+                <label htmlFor="eliminar-grado" className="block text-sm font-medium text-red-700 mb-1">Grado</label>
+                <select id="eliminar-grado" value={gradoEliminar} onChange={(e) => setGradoEliminar(e.target.value as Grado)} className="border border-red-300 rounded-lg px-3 py-2 text-sm">
                   <option value="">Todos</option>
-                  {GRADOS.map((g) => (
-                    <option key={g} value={g}>{g}</option>
-                  ))}
+                  {GRADOS.map((g) => (<option key={g} value={g}>{g}</option>))}
                 </select>
               </div>
               <div>
-                <label htmlFor="eliminar-turno" className="block text-sm font-medium text-red-700 mb-1">
-                  Turno
-                </label>
-                <select
-                  id="eliminar-turno"
-                  value={turnoEliminar}
-                  onChange={(e) => setTurnoEliminar(e.target.value as Turno)}
-                  className="border border-red-300 rounded-lg px-3 py-2 text-sm"
-                >
+                <label htmlFor="eliminar-turno" className="block text-sm font-medium text-red-700 mb-1">Turno</label>
+                <select id="eliminar-turno" value={turnoEliminar} onChange={(e) => setTurnoEliminar(e.target.value as Turno)} className="border border-red-300 rounded-lg px-3 py-2 text-sm">
                   <option value="">Todos</option>
-                  {TURNOS.map((t) => (
-                    <option key={t.value} value={t.value}>{t.label}</option>
-                  ))}
+                  {TURNOS.map((t) => (<option key={t.value} value={t.value}>{t.label}</option>))}
                 </select>
               </div>
-              {gradoEliminar && turnoEliminar && (
-                <p className="text-sm text-red-600 self-center">
-                  {alumnos.filter(
-                    (a) => a.grado === gradoEliminar && a.turno === turnoEliminar
-                  ).length}{" "}
-                  alumno(s) serÃ¡n eliminados
-                </p>
-              )}
               <div className="flex gap-2">
-                <Button
-                  variant="danger"
-                  loading={loadingEliminar}
-                  onClick={handleEliminarGrado}
-                >
-                  Confirmar eliminaciÃ³n
-                </Button>
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    setMostrarEliminarGrado(false);
-                    setGradoEliminar("");
-                    setTurnoEliminar("");
-                  }}
-                >
-                  Cancelar
-                </Button>
+                <Button variant="danger" loading={loadingEliminar} onClick={handleEliminarGrado}>Confirmar eliminacion</Button>
+                <Button variant="secondary" onClick={() => { setMostrarEliminarGrado(false); setGradoEliminar(""); setTurnoEliminar(""); }}>Cancelar</Button>
               </div>
             </div>
           )}
@@ -479,13 +338,9 @@ Esta acción no se puede deshacer.`
       )}
 
       <footer className="max-w-5xl mx-auto w-full text-center py-6 mt-4">
-        <p className="text-gray-400 text-xs italic">
-          Â© 2025 Rodriguez Juan Pablo â€” Todos los derechos reservados
-        </p>
+        <p className="text-gray-400 text-xs italic">2025 Rodriguez Juan Pablo</p>
       </footer>
       <MusicPlayer src="/joyinsound-upbeat-waves-of-sea-496465.mp3" />
     </main>
   );
 }
-
-
