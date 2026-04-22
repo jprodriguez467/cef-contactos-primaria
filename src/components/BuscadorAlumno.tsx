@@ -20,52 +20,46 @@ export function BuscadorAlumno({ onBuscar, loading }: BuscadorAlumnoProps) {
     onBuscar(grado, turno, apellido.trim());
   }
 
+  const inputStyle = {
+    background: "#1e3a6e",
+    border: "1px solid #3b5a9a",
+    color: "#ffffff",
+    borderRadius: "8px",
+    padding: "8px 12px",
+    fontSize: "14px",
+    width: "100%",
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
       <div>
-        <label className="block text-sm font-medium text-white/80 mb-1">Grado</label>
-        <select
-          value={grado}
-          onChange={(e) => setGrado(e.target.value as Grado)}
-          className="w-full bg-white/10 border border-white/20 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-white/30"
-          required
-        >
-          <option value="" className="text-gray-800">Seleccioná el grado</option>
+        <label style={{ display: "block", fontSize: "14px", fontWeight: 500, color: "#cbd5e1", marginBottom: "4px" }}>Grado</label>
+        <select value={grado} onChange={(e) => setGrado(e.target.value as Grado)} style={inputStyle} required>
+          <option value="" style={{ background: "#1e3a6e" }}>Seleccioná el grado</option>
           {GRADOS.map((g) => (
-            <option key={g} value={g} className="text-gray-800">
-              {g}
-            </option>
+            <option key={g} value={g} style={{ background: "#1e3a6e" }}>{g}</option>
           ))}
         </select>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-white/80 mb-1">Turno</label>
-        <select
-          value={turno}
-          onChange={(e) => setTurno(e.target.value as Turno)}
-          className="w-full bg-white/10 border border-white/20 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-white/30"
-          required
-        >
-          <option value="" className="text-gray-800">Seleccioná el turno</option>
+        <label style={{ display: "block", fontSize: "14px", fontWeight: 500, color: "#cbd5e1", marginBottom: "4px" }}>Turno</label>
+        <select value={turno} onChange={(e) => setTurno(e.target.value as Turno)} style={inputStyle} required>
+          <option value="" style={{ background: "#1e3a6e" }}>Seleccioná el turno</option>
           {TURNOS.map((t) => (
-            <option key={t.value} value={t.value} className="text-gray-800">
-              {t.label}
-            </option>
+            <option key={t.value} value={t.value} style={{ background: "#1e3a6e" }}>{t.label}</option>
           ))}
         </select>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-white/80 mb-1">
-          Apellido del alumno
-        </label>
+        <label style={{ display: "block", fontSize: "14px", fontWeight: 500, color: "#cbd5e1", marginBottom: "4px" }}>Apellido del alumno</label>
         <input
           type="text"
           value={apellido}
           onChange={(e) => setApellido(e.target.value)}
           placeholder="Ingresá el apellido"
-          className="w-full bg-white/10 border border-white/20 text-white placeholder-white/30 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-white/30"
+          style={inputStyle}
           required
         />
       </div>
