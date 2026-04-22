@@ -20,7 +20,7 @@ export default function PadresPage() {
   useEffect(() => {
     window.scrollTo(0, 0);
     try { if (window.top) window.top.scrollTo(0, 0); } catch (e) {}
-  }, [alumnoSeleccionado, verificado, mostrarFormulario]);
+  }, [alumnoSeleccionado, verificado, mostrarFormulario, guardado]);
 
   function scrollTop() {
     try { if (window.top) window.top.scrollTo(0, 0); } catch (e) {}
@@ -47,7 +47,23 @@ export default function PadresPage() {
       </main>
     );
   }
-
+if (alumnoSeleccionado && verificado && guardado) {
+  return (
+    <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 py-8 px-4">
+      <div className="max-w-xl mx-auto text-center py-16">
+        <div className="text-6xl mb-4">🗝️</div>
+        <h2 className="text-2xl font-bold text-white mb-3">¡Gracias!</h2>
+        <p className="text-white/70 mb-6">Ayudaste a desbloquear una palabra del mensaje secreto de tu grado.</p>
+        <button
+          onClick={() => { if(window.top) window.top.location.href = "https://cef-contactos-primaria.vercel.app/padres/juego"; else window.location.href = "https://cef-contactos-primaria.vercel.app/padres/juego"; }}
+          className="inline-block bg-yellow-400 hover:bg-yellow-300 text-yellow-900 font-bold py-3 px-6 rounded-full shadow-lg transition"
+        >
+          Ver ranking del grado 🏆
+        </button>
+      </div>
+    </main>
+  );
+}
   if (alumnoSeleccionado && verificado && mostrarFormulario) {
     return (
       <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 py-8 px-4">
