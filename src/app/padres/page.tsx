@@ -1,10 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { Toaster } from "react-hot-toast";
-import { GRADOS, TURNOS } from "@/types";
-import type { Grado, Turno } from "@/types";
+
 import { obtenerRanking } from "@/lib/frase-grado";
 import type { EntradaRanking } from "@/types/frase-grado";
 
@@ -27,12 +25,12 @@ export default function JuegoPage() {
     <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 py-8 px-4">
       <Toaster />
       <div className="max-w-xl mx-auto">
-        <Link
-          href="/padres"
-          className="inline-flex items-center gap-1 text-sm text-white/60 hover:text-white mb-4 transition"
-        >
-          ← Volver
-        </Link>
+<button
+  onClick={() => { if(window.top) window.top.location.href = "https://cef-contactos-primaria.vercel.app/padres"; else window.location.href = "https://cef-contactos-primaria.vercel.app/padres"; }}
+  className="inline-flex items-center gap-1 text-sm text-white/60 hover:text-white mb-4 transition"
+>
+  ← Volver
+</button>
 
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">🗝️</div>
@@ -91,14 +89,12 @@ export default function JuegoPage() {
             ))}
           </div>
         )}
-<div className="mt-8 text-center">
-          <Link
-            href="https://cef-contactos-primaria.vercel.app/padres"
-            className="inline-block bg-yellow-400 hover:bg-yellow-300 text-yellow-900 font-bold py-3 px-6 rounded-full shadow-lg transition"
-          >
-            Cargar mis datos y desbloquear palabras
-          </Link>
-        </div>
+<button
+  onClick={() => { if(window.top) window.top.location.href = "https://cef-contactos-primaria.vercel.app/padres"; else window.location.href = "https://cef-contactos-primaria.vercel.app/padres"; }}
+  className="inline-block bg-yellow-400 hover:bg-yellow-300 text-yellow-900 font-bold py-3 px-6 rounded-full shadow-lg transition"
+>
+  Cargar mis datos y desbloquear palabras
+</button>
       </div>
     </main>
   );
