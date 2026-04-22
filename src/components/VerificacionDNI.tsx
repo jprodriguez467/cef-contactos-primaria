@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import type { Alumno } from "@/types";
@@ -17,7 +16,6 @@ export function VerificacionDNI({ alumno, onVerificado, onCancelar }: Verificaci
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!alumno.dni) {
-      // Sin DNI cargado, se deja pasar
       onVerificado();
       return;
     }
@@ -29,34 +27,41 @@ export function VerificacionDNI({ alumno, onVerificado, onCancelar }: Verificaci
     }
   }
 
+  const inputStyle = {
+    background: "#1e3a6e",
+    border: "1px solid #3b5a9a",
+    color: "#ffffff",
+    borderRadius: "8px",
+    padding: "8px 12px",
+    fontSize: "14px",
+    width: "100%",
+  };
+
   return (
-    <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 shadow-lg">
-      <h2 className="text-base font-semibold text-white mb-1">Verificación de identidad</h2>
-      <p className="text-sm text-white/60 mb-4">
-        Para acceder a los datos de{" "}
-        <span className="text-white font-medium">{alumno.nombreCompleto}</span>, ingresá el DNI del alumno/a.
+    <div style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "16px", padding: "24px", boxShadow: "0 4px 24px rgba(0,0,0,0.3)" }}>
+      <h2 style={{ color: "#ffffff", fontWeight: 600, fontSize: "16px", marginBottom: "4px" }}>Verificación de identidad</h2>
+      <p style={{ color: "#94a3b8", fontSize: "14px", marginBottom: "16px" }}>
+        Para acceder a los datos de <strong style={{ color: "#ffffff" }}>{alumno.nombreCompleto}</strong>, ingresá el DNI del alumno/a.
       </p>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
         <div>
-          <label className="block text-sm font-medium text-white/80 mb-1">
-            DNI del alumno/a
-          </label>
+          <label style={{ display: "block", fontSize: "14px", fontWeight: 500, color: "#cbd5e1", marginBottom: "4px" }}>DNI del alumno/a</label>
           <input
             type="text"
             value={dni}
             onChange={(e) => { setDni(e.target.value); setError(""); }}
             placeholder="Ej: 12345678"
-            className="w-full bg-white/10 border border-white/20 text-white placeholder-white/30 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-white/30"
+            style={inputStyle}
             required
             autoFocus
           />
         </div>
         {error && (
-          <p className="text-sm text-red-300 bg-red-500/10 border border-red-400/20 rounded-lg px-3 py-2">
+          <p style={{ color: "#fca5a5", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: "8px", padding: "8px 12px", fontSize: "14px" }}>
             {error}
           </p>
         )}
-        <div className="flex gap-3">
+        <div style={{ display: "flex", gap: "12px" }}>
           <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg shadow transition">
             Verificar
           </Button>
