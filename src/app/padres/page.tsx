@@ -14,6 +14,7 @@ export default function PadresPage() {
   const [alumnoSeleccionado, setAlumnoSeleccionado] = useState<Alumno | null>(null);
   const [verificado, setVerificado] = useState(false);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [guardado, setGuardado] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -53,7 +54,7 @@ export default function PadresPage() {
         <div className="max-w-xl mx-auto">
           <FormularioContacto
             alumno={alumnoSeleccionado}
-            onGuardado={(actualizado) => { setAlumnoSeleccionado(actualizado); setMostrarFormulario(false); scrollTop(); }}
+            onGuardado={(actualizado) => { setAlumnoSeleccionado(actualizado); setMostrarFormulario(false); setGuardado(true); scrollTop(); }}
 onCancelar={() => { setMostrarFormulario(false); scrollTop(); }}
           />
         </div>
