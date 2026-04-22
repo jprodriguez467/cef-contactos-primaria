@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import { BuscadorAlumno } from "@/components/BuscadorAlumno";
 import { FichaAlumno } from "@/components/FichaAlumno";
@@ -13,7 +13,10 @@ export default function PadresPage() {
   const [alumnoSeleccionado, setAlumnoSeleccionado] = useState<Alumno | null>(null);
   const [verificado, setVerificado] = useState(false);
   const [loading, setLoading] = useState(false);
-
+function scrollTop() {
+  try { if(window.top) window.top.scrollTo(0,0); } catch(e) {}
+  window.scrollTo(0,0);
+}
   async function handleBuscar(grado: string, turno: string, apellido: string) {
     setLoading(true);
     const data = await buscarAlumnos(grado, turno, apellido);
@@ -21,15 +24,19 @@ export default function PadresPage() {
     setLoading(false);
   }
 
-  if (alumnoSeleccionado && !verificado) {
-    return (
-      <VerificacionDNI
-        alumno={alumnoSeleccionado}
-        onVerificado={() => setVerificado(true)}
-         onCancelar={() => setAlumnoSeleccionado(null)}
-      />
-    );
-  }
+if (alumnoSeleccionado && !verificado) {
+  return (
+    <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 py-8 px-4">
+      <div className="max-w-xl mx-auto">
+        <VerificacionDNI
+          alumno={alumnoSeleccionado}
+          onVerificado={() => setVerificado(true)}
+          onCancelar={() => { setAlumnoSeleccionado(null); scrollTop(); }}
+        />
+      </div>
+    </main>
+  );
+}
 
   if (alumnoSeleccionado && verificado) {
     return (
@@ -50,7 +57,7 @@ export default function PadresPage() {
             {resultados.map((a) => (
               <button
                 key={a.id}
-                onClick={() => setAlumnoSeleccionado(a)}
+               onClick={() => { setAlumnoSeleccionado(a); scrollTop(); }}
                 className="w-full text-left bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl px-4 py-3 text-white transition"
               >
                 {a.nombreCompleto} — {a.grado} ({a.turno === "manana" ? "Mañana" : "Tarde"})
