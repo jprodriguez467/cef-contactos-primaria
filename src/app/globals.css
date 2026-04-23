@@ -96,3 +96,7 @@ footer.pie h5.cont {
   font-style: italic;
   color: #f0c040;
 }
+/* Fondo fijo para paginas de padres y docentes */
+main {
+  background-color: #0f172a !important;
+}
