@@ -38,9 +38,8 @@ export function BuscadorAlumno({ onBuscar, loading }: BuscadorAlumnoProps) {
     borderRadius: "8px",
     padding: "10px 14px",
     fontSize: "15px",
-    appearance: "auto",
-    WebkitAppearance: "auto",
-    MozAppearance: "auto",
+    
+  
   } as React.CSSProperties;
 
   return (
