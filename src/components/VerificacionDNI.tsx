@@ -15,59 +15,48 @@ export function VerificacionDNI({ alumno, onVerificado, onCancelar }: Verificaci
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!alumno.dni) {
-      onVerificado();
-      return;
-    }
+    if (!alumno.dni) { onVerificado(); return; }
     if (dni.trim() === alumno.dni.trim()) {
-      setError("");
-      onVerificado();
+      setError(""); onVerificado();
     } else {
       setError("DNI incorrecto, no podés acceder a estos datos.");
     }
   }
 
-  const inputStyle = {
-    background: "#1e3a6e",
-    border: "1px solid #3b5a9a",
-    color: "#ffffff",
-    borderRadius: "8px",
-    padding: "8px 12px",
-    fontSize: "14px",
-    width: "100%",
+  const inputStyle: React.CSSProperties = {
+    display: "block", width: "100%", boxSizing: "border-box",
+    background: "#1e3a6e", border: "2px solid #3b5a9a",
+    color: "#ffffff", borderRadius: "8px", padding: "10px 14px", fontSize: "15px",
   };
 
   return (
-    <div style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "16px", padding: "24px", boxShadow: "0 4px 24px rgba(0,0,0,0.3)" }}>
+    <div style={{ background: "#1e3a8a", border: "2px solid #3b82f6", borderRadius: "16px", padding: "24px", boxShadow: "0 4px 24px #000" }}>
       <h2 style={{ color: "#ffffff", fontWeight: 600, fontSize: "16px", marginBottom: "4px" }}>Verificación de identidad</h2>
-      <p style={{ color: "#94a3b8", fontSize: "14px", marginBottom: "16px" }}>
+      <p style={{ color: "#93c5fd", fontSize: "14px", marginBottom: "16px" }}>
         Para acceder a los datos de <strong style={{ color: "#ffffff" }}>{alumno.nombreCompleto}</strong>, ingresá el DNI del alumno/a.
       </p>
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-        <div>
-          <label style={{ display: "block", fontSize: "14px", fontWeight: 500, color: "#cbd5e1", marginBottom: "4px" }}>DNI del alumno/a</label>
+      <form onSubmit={handleSubmit}>
+        <div style={{ marginBottom: "16px" }}>
+          <label style={{ display: "block", fontSize: "14px", fontWeight: 500, color: "#ffffff", marginBottom: "6px" }}>DNI del alumno/a</label>
           <input
-            type="text"
-            value={dni}
+            type="text" value={dni}
             onChange={(e) => { setDni(e.target.value); setError(""); }}
             placeholder="Ej: 12345678"
-            style={inputStyle}
-            required
-            autoFocus
+            style={inputStyle} required autoFocus
           />
         </div>
         {error && (
-          <p style={{ color: "#fca5a5", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: "8px", padding: "8px 12px", fontSize: "14px" }}>
+          <p style={{ color: "#fca5a5", background: "#7f1d1d", border: "1px solid #ef4444", borderRadius: "8px", padding: "8px 12px", fontSize: "14px", marginBottom: "16px" }}>
             {error}
           </p>
         )}
-        <div style={{ display: "flex", gap: "12px" }}>
-          <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg shadow transition">
-            Verificar
-          </Button>
-          <Button type="button" variant="secondary" onClick={onCancelar}>
-            Cancelar
-          </Button>
+        <div style={{ display: "flex", marginTop: "8px" }}>
+          <div style={{ marginRight: "12px" }}>
+            <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg shadow transition">
+              Verificar
+            </Button>
+          </div>
+          <Button type="button" variant="secondary" onClick={onCancelar}>Cancelar</Button>
         </div>
       </form>
     </div>

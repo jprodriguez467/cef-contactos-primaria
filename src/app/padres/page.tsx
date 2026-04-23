@@ -9,6 +9,21 @@ import { FormularioContacto } from "@/components/FormularioContacto";
 import { buscarAlumnos } from "@/lib/firestore";
 import type { Alumno } from "@/types";
 
+const bgPage: React.CSSProperties = {
+  minHeight: "100vh",
+  backgroundColor: "#0f172a",
+  padding: "32px 16px",
+};
+
+const bgCard: React.CSSProperties = {
+  backgroundColor: "#1e3a8a",
+  borderRadius: "16px",
+  padding: "24px",
+  maxWidth: "580px",
+  margin: "0 auto",
+  boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
+};
+
 export default function PadresPage() {
   const [resultados, setResultados] = useState<Alumno[]>([]);
   const [alumnoSeleccionado, setAlumnoSeleccionado] = useState<Alumno | null>(null);
@@ -36,8 +51,8 @@ export default function PadresPage() {
 
   if (alumnoSeleccionado && !verificado) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 py-8 px-4">
-        <div className="max-w-xl mx-auto">
+      <main style={bgPage}>
+        <div style={bgCard}>
           <VerificacionDNI
             alumno={alumnoSeleccionado}
             onVerificado={() => setVerificado(true)}
@@ -47,31 +62,33 @@ export default function PadresPage() {
       </main>
     );
   }
-if (alumnoSeleccionado && verificado && guardado) {
-  return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 py-8 px-4">
-      <div className="max-w-xl mx-auto text-center py-16">
-        <div className="text-6xl mb-4">🗝️</div>
-        <h2 className="text-2xl font-bold text-white mb-3">¡Gracias!</h2>
-        <p className="text-white/70 mb-6">Ayudaste a desbloquear una palabra del mensaje secreto de tu grado.</p>
-        <button
-          onClick={() => { if(window.top) window.top.location.href = "https://cef-contactos-primaria.vercel.app/padres/juego"; else window.location.href = "https://cef-contactos-primaria.vercel.app/padres/juego"; }}
-          className="inline-block bg-yellow-400 hover:bg-yellow-300 text-yellow-900 font-bold py-3 px-6 rounded-full shadow-lg transition"
-        >
-          Ver ranking del grado 🏆
-        </button>
-      </div>
-    </main>
-  );
-}
+
+  if (alumnoSeleccionado && verificado && guardado) {
+    return (
+      <main style={bgPage}>
+        <div style={{ ...bgCard, textAlign: "center", paddingTop: "48px", paddingBottom: "48px" }}>
+          <div style={{ fontSize: "64px", marginBottom: "16px" }}>🗝️</div>
+          <h2 style={{ fontSize: "24px", fontWeight: "bold", color: "#ffffff", marginBottom: "12px" }}>¡Gracias!</h2>
+          <p style={{ color: "#93c5fd", marginBottom: "24px" }}>Ayudaste a desbloquear una palabra del mensaje secreto de tu grado.</p>
+          <button
+            onClick={() => { window.location.href = "https://cef-contactos-primaria.vercel.app/padres/juego"; }}
+            style={{ backgroundColor: "#facc15", color: "#713f12", fontWeight: "bold", padding: "12px 24px", borderRadius: "999px", border: "none", cursor: "pointer", fontSize: "16px" }}
+          >
+            Ver ranking del grado 🏆
+          </button>
+        </div>
+      </main>
+    );
+  }
+
   if (alumnoSeleccionado && verificado && mostrarFormulario) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 py-8 px-4">
-        <div className="max-w-xl mx-auto">
+      <main style={bgPage}>
+        <div style={bgCard}>
           <FormularioContacto
             alumno={alumnoSeleccionado}
             onGuardado={(actualizado) => { setAlumnoSeleccionado(actualizado); setMostrarFormulario(false); setGuardado(true); scrollTop(); }}
-onCancelar={() => { setMostrarFormulario(false); scrollTop(); }}
+            onCancelar={() => { setMostrarFormulario(false); scrollTop(); }}
           />
         </div>
       </main>
@@ -80,8 +97,8 @@ onCancelar={() => { setMostrarFormulario(false); scrollTop(); }}
 
   if (alumnoSeleccionado && verificado) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 py-8 px-4">
-        <div className="max-w-xl mx-auto">
+      <main style={bgPage}>
+        <div style={bgCard}>
           <FichaAlumno
             alumno={alumnoSeleccionado}
             onSeleccionar={() => { setMostrarFormulario(true); scrollTop(); }}
@@ -92,17 +109,19 @@ onCancelar={() => { setMostrarFormulario(false); scrollTop(); }}
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 py-8 px-4">
+    <main style={bgPage}>
       <Toaster />
-      <div className="max-w-xl mx-auto">
-        <BuscadorAlumno onBuscar={handleBuscar} loading={loading} />
+      <div style={{ maxWidth: "580px", margin: "0 auto" }}>
+        <div style={bgCard}>
+          <BuscadorAlumno onBuscar={handleBuscar} loading={loading} />
+        </div>
         {resultados.length > 0 && (
-          <div className="mt-4 flex flex-col gap-2">
+          <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "8px" }}>
             {resultados.map((a) => (
               <button
                 key={a.id}
                 onClick={() => { setAlumnoSeleccionado(a); scrollTop(); }}
-                className="w-full text-left bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl px-4 py-3 text-white transition"
+                style={{ width: "100%", textAlign: "left", backgroundColor: "#1e3a8a", border: "1px solid #3b82f6", borderRadius: "12px", padding: "12px 16px", color: "#ffffff", cursor: "pointer", fontSize: "15px" }}
               >
                 {a.nombreCompleto} — {a.grado} ({a.turno === "manana" ? "Mañana" : "Tarde"})
               </button>
