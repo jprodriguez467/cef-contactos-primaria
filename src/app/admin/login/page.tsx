@@ -11,7 +11,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { toast, Toaster } from "react-hot-toast";
 import MusicPlayer from '../../../components/MusicPlayer';
 
-const ADMIN_EMAIL = "admin@cef-sanfrancisco.edu.ar";
+const ADMIN_EMAIL = "jprodriguez467@gmail.com";
 
 export default function AdminLoginPage() {
   const router = useRouter();
