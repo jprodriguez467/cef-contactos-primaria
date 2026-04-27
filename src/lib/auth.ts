@@ -7,7 +7,7 @@ import {
 } from "firebase/auth";
 import { getApp } from "./firebase";
 
-const ADMIN_EMAIL = "admin@cef-sanfrancisco.edu.ar";
+const ADMIN_EMAIL = "jprodriguez467@gmail.com";
 
 export async function loginDocente(email: string, password: string): Promise<User> {
   const cred = await signInWithEmailAndPassword(getAuth(getApp()), email, password);
