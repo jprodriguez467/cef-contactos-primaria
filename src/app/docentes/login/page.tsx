@@ -13,7 +13,7 @@ import MusicPlayer from '../../../components/MusicPlayer';
 
 export default function DocentesLoginPage() {
   const router = useRouter();
-  const [email] = useState("docentes@cef-sanfrancisco.edu.ar");
+ const [email] = useState("cefsanfrancisco1001sf@gmail.com");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
