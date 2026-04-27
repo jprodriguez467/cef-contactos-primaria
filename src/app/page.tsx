@@ -65,4 +65,13 @@ export default function HomePage() {
             href="/padres/juego"
             className="w-full bg-yellow-400 hover:bg-yellow-300 text-gray-900 text-center font-semibold py-3 px-6 rounded-xl shadow-lg transition-colors"
           >
+           
             🏆 Ranking del grado
+          </Link>
+        </div>
+      </div>
+
+      <MusicPlayer src="/moodmode-no-copyright-music-201745.mp3" />
+    </main>
+  );
+}
