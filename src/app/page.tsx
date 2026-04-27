@@ -59,14 +59,10 @@ export default function HomePage() {
             href="/admin/login"
             className="w-full bg-white/10 hover:bg-white/20 text-white/80 text-center text-sm py-3 px-6 rounded-xl border border-white/20 backdrop-blur-sm transition-colors"
           >
-            Acceso administrador
+          Acceso administrador
           </Link>
-        </div>
-      </div>
-
-   
-
-      <MusicPlayer src="/moodmode-no-copyright-music-201745.mp3" />
-    </main>
-  );
-}
+          <Link
+            href="/padres/juego"
+            className="w-full bg-yellow-400 hover:bg-yellow-300 text-gray-900 text-center font-semibold py-3 px-6 rounded-xl shadow-lg transition-colors"
+          >
+            🏆 Ranking del grado
