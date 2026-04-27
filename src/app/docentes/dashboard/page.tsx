@@ -48,7 +48,7 @@ export default function DocentesDashboardPage() {
   if (!user) return null;
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 py-8 px-4">
+    <main className="min-h-screen bg-black py-8 px-4">
       <Toaster />
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-6">
