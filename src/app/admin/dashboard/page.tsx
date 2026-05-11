@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -8,6 +8,7 @@ import { getAllAlumnos, eliminarAlumno, eliminarGradoCompleto, eliminarTodosAlum
 import { SubirExcel } from "@/components/SubirExcel";
 import { TablaAlumnos } from "@/components/TablaAlumnos";
 import { ModalAgregarAlumno } from "@/components/ModalAgregarAlumno";
+import { PanelCuotas } from "@/components/PanelCuotas"; // ← NUEVO
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { GRADOS, TURNOS, type Grado, type Turno } from "@/types";
@@ -15,9 +16,12 @@ import { toast, Toaster } from "react-hot-toast";
 import type { Alumno } from "@/types";
 import MusicPlayer from '../../../components/MusicPlayer';
 
+type Tab = "alumnos" | "cuotas"; // ← NUEVO
+
 export default function AdminDashboardPage() {
   const { user, loading: authLoading, isAdmin } = useAuth();
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState<Tab>("alumnos"); // ← NUEVO
   const [alumnos, setAlumnos] = useState<Alumno[]>([]);
   const [filtrados, setFiltrados] = useState<Alumno[]>([]);
   const [loading, setLoading] = useState(false);
@@ -204,6 +208,8 @@ export default function AdminDashboardPage() {
     <main className="min-h-screen bg-gray-50 py-8 px-4">
       <Toaster />
       <div className="max-w-5xl mx-auto">
+
+        {/* ——— ENCABEZADO ——— */}
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-800">Panel Administrador</h1>
           <Button variant="secondary" onClick={handleLogout}>
@@ -211,123 +217,157 @@ export default function AdminDashboardPage() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <Card>
-            <p className="text-3xl font-bold text-blue-600">{alumnos.length}</p>
-            <p className="text-sm text-gray-500 mt-1">Total alumnos</p>
-          </Card>
-          <Card>
-            <p className="text-3xl font-bold text-green-600">
-              {alumnos.filter((a) => a.telefono1).length}
-            </p>
-            <p className="text-sm text-gray-500 mt-1">Con contacto cargado</p>
-          </Card>
-          <Card>
-            <p className="text-3xl font-bold text-orange-500">
-              {alumnos.filter((a) => !a.telefono1).length}
-            </p>
-            <p className="text-sm text-gray-500 mt-1">Sin contacto</p>
-          </Card>
+        {/* ——— TABS ——— */}
+        <div className="flex gap-1 mb-6 bg-gray-200 p-1 rounded-xl w-fit">
+          <button
+            onClick={() => setActiveTab("alumnos")}
+            className={`px-5 py-2 rounded-lg text-sm font-medium transition-colors ${
+              activeTab === "alumnos"
+                ? "bg-white text-gray-800 shadow-sm"
+                : "text-gray-600 hover:text-gray-800"
+            }`}
+          >
+            👥 Alumnos
+          </button>
+          <button
+            onClick={() => setActiveTab("cuotas")}
+            className={`px-5 py-2 rounded-lg text-sm font-medium transition-colors ${
+              activeTab === "cuotas"
+                ? "bg-white text-gray-800 shadow-sm"
+                : "text-gray-600 hover:text-gray-800"
+            }`}
+          >
+            💰 Cuotas
+          </button>
         </div>
 
-        <Card className="mb-6">
-          <h2 className="font-semibold text-gray-700 mb-3">Importar alumnos</h2>
-          <SubirExcel />
-          <Button variant="secondary" className="mt-3 text-xs" onClick={cargar}>
-            Recargar lista
-          </Button>
-        </Card>
-
-        <Card>
-          <div className="flex flex-wrap gap-4 mb-4 items-end justify-between">
-            <div className="flex flex-wrap gap-4 items-end">
-              <div>
-                <label htmlFor="filtro-grado" className="block text-sm font-medium text-gray-700 mb-1">
-                  Filtrar por grado
-                </label>
-                <select
-                  id="filtro-grado"
-                  value={gradoFiltro}
-                  onChange={(e) => {
-                    const g = e.target.value as Grado | "";
-                    setGradoFiltro(g);
-                    aplicarFiltros(g, turnoFiltro, alumnos);
-                  }}
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
-                >
-                  <option value="">Todos</option>
-                  {GRADOS.map((g) => (
-                    <option key={g} value={g}>{g}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label htmlFor="filtro-turno"
-                 className="block text-sm font-medium text-gray-700 mb-1">
-                  Filtrar por turno
-                </label>
-                <select id="filtro-turno" value={turnoFiltro} onChange={(e) => { const t = e.target.value as Turno | ""; setTurnoFiltro(t); aplicarFiltros(gradoFiltro, t, alumnos); }} className="border border-gray-300 rounded-lg px-3 py-2 text-sm">
-                  <option value="">Todos</option>
-                  {TURNOS.map((t) => (<option key={t.value} value={t.value}>{t.label}</option>))}
-                </select>
-              </div>
+        {/* ——— TAB ALUMNOS (todo lo que ya existía) ——— */}
+        {activeTab === "alumnos" && (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <Card>
+                <p className="text-3xl font-bold text-blue-600">{alumnos.length}</p>
+                <p className="text-sm text-gray-500 mt-1">Total alumnos</p>
+              </Card>
+              <Card>
+                <p className="text-3xl font-bold text-green-600">
+                  {alumnos.filter((a) => a.telefono1).length}
+                </p>
+                <p className="text-sm text-gray-500 mt-1">Con contacto cargado</p>
+              </Card>
+              <Card>
+                <p className="text-3xl font-bold text-orange-500">
+                  {alumnos.filter((a) => !a.telefono1).length}
+                </p>
+                <p className="text-sm text-gray-500 mt-1">Sin contacto</p>
+              </Card>
             </div>
-            <div className="flex gap-2 flex-wrap">
-              <Button onClick={() => setMostrarModalAgregar(true)}>+ Agregar alumno</Button>
-            <button onClick={() => window.location.href='/admin/frases'} className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">Frases del juego</button>
-              <Button variant="secondary" onClick={() => { setMostrarLimpiarGrado((v) => !v); setMostrarEliminarGrado(false); }}>Limpiar contactos del grado</Button>
-              <Button variant="danger" onClick={() => { setMostrarEliminarGrado((v) => !v); setMostrarLimpiarGrado(false); }}>Eliminar grado completo</Button>
-            </div>
-          </div>
 
-          {mostrarLimpiarGrado && (
-            <div className="mb-4 p-4 border border-yellow-200 bg-yellow-50 rounded-lg flex flex-wrap gap-4 items-end">
-              <div>
-                <label htmlFor="limpiar-grado" className="block text-sm font-medium text-yellow-800 mb-1">Grado</label>
-                <select id="limpiar-grado" value={gradoLimpiar} onChange={(e) => setGradoLimpiar(e.target.value as Grado)} className="border border-yellow-300 rounded-lg px-3 py-2 text-sm">
-                  <option value="">Todos</option>
-                  {GRADOS.map((g) => (<option key={g} value={g}>{g}</option>))}
-                </select>
-              </div>
-              <div>
-                <label htmlFor="limpiar-turno" className="block text-sm font-medium text-yellow-800 mb-1">Turno</label>
-                <select id="limpiar-turno" value={turnoLimpiar} onChange={(e) => setTurnoLimpiar(e.target.value as Turno)} className="border border-yellow-300 rounded-lg px-3 py-2 text-sm">
-                  <option value="">Todos</option>
-                  {TURNOS.map((t) => (<option key={t.value} value={t.value}>{t.label}</option>))}
-                </select>
-              </div>
-              <div className="flex gap-2">
-                <Button variant="secondary" loading={loadingLimpiar} onClick={handleLimpiarGrado}>Confirmar limpieza</Button>
-                <Button variant="secondary" onClick={() => { setMostrarLimpiarGrado(false); setGradoLimpiar(""); setTurnoLimpiar(""); }}>Cancelar</Button>
-              </div>
-            </div>
-          )}
+            <Card className="mb-6">
+              <h2 className="font-semibold text-gray-700 mb-3">Importar alumnos</h2>
+              <SubirExcel />
+              <Button variant="secondary" className="mt-3 text-xs" onClick={cargar}>
+                Recargar lista
+              </Button>
+            </Card>
 
-          {mostrarEliminarGrado && (
-            <div className="mb-4 p-4 border border-red-200 bg-red-50 rounded-lg flex flex-wrap gap-4 items-end">
-              <div>
-                <label htmlFor="eliminar-grado" className="block text-sm font-medium text-red-700 mb-1">Grado</label>
-                <select id="eliminar-grado" value={gradoEliminar} onChange={(e) => setGradoEliminar(e.target.value as Grado)} className="border border-red-300 rounded-lg px-3 py-2 text-sm">
-                  <option value="">Todos</option>
-                  {GRADOS.map((g) => (<option key={g} value={g}>{g}</option>))}
-                </select>
+            <Card>
+              <div className="flex flex-wrap gap-4 mb-4 items-end justify-between">
+                <div className="flex flex-wrap gap-4 items-end">
+                  <div>
+                    <label htmlFor="filtro-grado" className="block text-sm font-medium text-gray-700 mb-1">
+                      Filtrar por grado
+                    </label>
+                    <select
+                      id="filtro-grado"
+                      value={gradoFiltro}
+                      onChange={(e) => {
+                        const g = e.target.value as Grado | "";
+                        setGradoFiltro(g);
+                        aplicarFiltros(g, turnoFiltro, alumnos);
+                      }}
+                      className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                    >
+                      <option value="">Todos</option>
+                      {GRADOS.map((g) => (
+                        <option key={g} value={g}>{g}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="filtro-turno" className="block text-sm font-medium text-gray-700 mb-1">
+                      Filtrar por turno
+                    </label>
+                    <select id="filtro-turno" value={turnoFiltro} onChange={(e) => { const t = e.target.value as Turno | ""; setTurnoFiltro(t); aplicarFiltros(gradoFiltro, t, alumnos); }} className="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                      <option value="">Todos</option>
+                      {TURNOS.map((t) => (<option key={t.value} value={t.value}>{t.label}</option>))}
+                    </select>
+                  </div>
+                </div>
+                <div className="flex gap-2 flex-wrap">
+                  <Button onClick={() => setMostrarModalAgregar(true)}>+ Agregar alumno</Button>
+                  <button onClick={() => window.location.href='/admin/frases'} className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">Frases del juego</button>
+                  <Button variant="secondary" onClick={() => { setMostrarLimpiarGrado((v) => !v); setMostrarEliminarGrado(false); }}>Limpiar contactos del grado</Button>
+                  <Button variant="danger" onClick={() => { setMostrarEliminarGrado((v) => !v); setMostrarLimpiarGrado(false); }}>Eliminar grado completo</Button>
+                </div>
               </div>
-              <div>
-                <label htmlFor="eliminar-turno" className="block text-sm font-medium text-red-700 mb-1">Turno</label>
-                <select id="eliminar-turno" value={turnoEliminar} onChange={(e) => setTurnoEliminar(e.target.value as Turno)} className="border border-red-300 rounded-lg px-3 py-2 text-sm">
-                  <option value="">Todos</option>
-                  {TURNOS.map((t) => (<option key={t.value} value={t.value}>{t.label}</option>))}
-                </select>
-              </div>
-              <div className="flex gap-2">
-                <Button variant="danger" loading={loadingEliminar} onClick={handleEliminarGrado}>Confirmar eliminacion</Button>
-                <Button variant="secondary" onClick={() => { setMostrarEliminarGrado(false); setGradoEliminar(""); setTurnoEliminar(""); }}>Cancelar</Button>
-              </div>
-            </div>
-          )}
 
-          <TablaAlumnos alumnos={filtrados} onEliminar={handleEliminar} onLimpiar={handleLimpiar} loading={loading} />
-        </Card>
+              {mostrarLimpiarGrado && (
+                <div className="mb-4 p-4 border border-yellow-200 bg-yellow-50 rounded-lg flex flex-wrap gap-4 items-end">
+                  <div>
+                    <label htmlFor="limpiar-grado" className="block text-sm font-medium text-yellow-800 mb-1">Grado</label>
+                    <select id="limpiar-grado" value={gradoLimpiar} onChange={(e) => setGradoLimpiar(e.target.value as Grado)} className="border border-yellow-300 rounded-lg px-3 py-2 text-sm">
+                      <option value="">Todos</option>
+                      {GRADOS.map((g) => (<option key={g} value={g}>{g}</option>))}
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="limpiar-turno" className="block text-sm font-medium text-yellow-800 mb-1">Turno</label>
+                    <select id="limpiar-turno" value={turnoLimpiar} onChange={(e) => setTurnoLimpiar(e.target.value as Turno)} className="border border-yellow-300 rounded-lg px-3 py-2 text-sm">
+                      <option value="">Todos</option>
+                      {TURNOS.map((t) => (<option key={t.value} value={t.value}>{t.label}</option>))}
+                    </select>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="secondary" loading={loadingLimpiar} onClick={handleLimpiarGrado}>Confirmar limpieza</Button>
+                    <Button variant="secondary" onClick={() => { setMostrarLimpiarGrado(false); setGradoLimpiar(""); setTurnoLimpiar(""); }}>Cancelar</Button>
+                  </div>
+                </div>
+              )}
+
+              {mostrarEliminarGrado && (
+                <div className="mb-4 p-4 border border-red-200 bg-red-50 rounded-lg flex flex-wrap gap-4 items-end">
+                  <div>
+                    <label htmlFor="eliminar-grado" className="block text-sm font-medium text-red-700 mb-1">Grado</label>
+                    <select id="eliminar-grado" value={gradoEliminar} onChange={(e) => setGradoEliminar(e.target.value as Grado)} className="border border-red-300 rounded-lg px-3 py-2 text-sm">
+                      <option value="">Todos</option>
+                      {GRADOS.map((g) => (<option key={g} value={g}>{g}</option>))}
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="eliminar-turno" className="block text-sm font-medium text-red-700 mb-1">Turno</label>
+                    <select id="eliminar-turno" value={turnoEliminar} onChange={(e) => setTurnoEliminar(e.target.value as Turno)} className="border border-red-300 rounded-lg px-3 py-2 text-sm">
+                      <option value="">Todos</option>
+                      {TURNOS.map((t) => (<option key={t.value} value={t.value}>{t.label}</option>))}
+                    </select>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="danger" loading={loadingEliminar} onClick={handleEliminarGrado}>Confirmar eliminacion</Button>
+                    <Button variant="secondary" onClick={() => { setMostrarEliminarGrado(false); setGradoEliminar(""); setTurnoEliminar(""); }}>Cancelar</Button>
+                  </div>
+                </div>
+              )}
+
+              <TablaAlumnos alumnos={filtrados} onEliminar={handleEliminar} onLimpiar={handleLimpiar} loading={loading} />
+            </Card>
+          </>
+        )}
+
+        {/* ——— TAB CUOTAS ——— */}
+        {activeTab === "cuotas" && (
+          <PanelCuotas alumnos={alumnos} />
+        )}
+
       </div>
 
       {mostrarModalAgregar && (
