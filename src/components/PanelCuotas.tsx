@@ -15,7 +15,19 @@ import { useAuth } from "@/hooks/useAuth";
 import { GRADOS, TURNOS, type Grado, type Turno } from "@/types";
 
 const CUOTA_BASE = 35000;
-const CUOTA_CON_DESCUENTO = 30000; // para familias con 2+ hijos
+const CUOTA_CON_DESCUENTO = 30000;
+
+const MESES_2026 = [
+  { key: "2026-03", label: "Marzo" },
+  { key: "2026-04", label: "Abril" },
+  { key: "2026-05", label: "Mayo" },
+  { key: "2026-06", label: "Junio" },
+  { key: "2026-07", label: "Julio" },
+  { key: "2026-08", label: "Agosto" },
+  { key: "2026-09", label: "Septiembre" },
+  { key: "2026-10", label: "Octubre" },
+  { key: "2026-11", label: "Noviembre" },
+];
 
 interface Props {
   alumnos: Alumno[];
@@ -24,7 +36,6 @@ interface Props {
 export function PanelCuotas({ alumnos }: Props) {
   const { user } = useAuth();
 
-  // Mes seleccionado — por defecto el actual
   const [mes, setMes] = useState(() => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
@@ -33,8 +44,16 @@ export function PanelCuotas({ alumnos }: Props) {
   const [cuotas, setCuotas] = useState<Record<string, Cuota>>({});
   const [loading, setLoading] = useState(false);
 
-  // Modal de pago
+  // Cache de todos los meses
+  const [todosMeses, setTodosMeses] = useState<Record<string, Record<string, Cuota>>>({});
+
+  // Modal detalle alumno
+  const [alumnoDetalle, setAlumnoDetalle] = useState<Alumno | null>(null);
+  const [loadingDetalle, setLoadingDetalle] = useState(false);
+
+  // Modal pago
   const [modalAlumno, setModalAlumno] = useState<Alumno | null>(null);
+  const [mesModal, setMesModal] = useState("");
   const [montoPagado, setMontoPagado] = useState("");
   const [formaPago, setFormaPago] = useState<FormaPago>("efectivo");
   const [nota, setNota] = useState("");
@@ -50,6 +69,7 @@ export function PanelCuotas({ alumnos }: Props) {
     try {
       const data = await getCuotasMes(mes);
       setCuotas(data);
+      setTodosMeses((prev) => ({ ...prev, [mes]: data }));
     } catch {
       toast.error("Error al cargar cuotas");
     } finally {
@@ -61,7 +81,25 @@ export function PanelCuotas({ alumnos }: Props) {
     cargarCuotas();
   }, [mes]);
 
-  // Calcula monto según si tiene hermanos en la escuela
+  async function abrirDetalle(alumno: Alumno) {
+    setAlumnoDetalle(alumno);
+    setLoadingDetalle(true);
+    try {
+      const updates: Record<string, Record<string, Cuota>> = { ...todosMeses };
+      for (const { key } of MESES_2026) {
+        if (!updates[key]) {
+          const data = await getCuotasMes(key);
+          updates[key] = data;
+        }
+      }
+      setTodosMeses(updates);
+    } catch {
+      toast.error("Error al cargar historial");
+    } finally {
+      setLoadingDetalle(false);
+    }
+  }
+
   function getMontoAcordado(alumno: Alumno): number {
     if (!alumno.telefono1) return CUOTA_BASE;
     const hermanos = alumnos.filter((a) => a.telefono1 === alumno.telefono1).length;
@@ -73,7 +111,6 @@ export function PanelCuotas({ alumnos }: Props) {
     return alumnos.filter((a) => a.telefono1 === alumno.telefono1).length;
   }
 
-  // Estadísticas del mes
   const stats = useMemo(() => {
     const pagados = alumnos.filter((a) => cuotas[a.id!]?.estado === "pagado").length;
     const parciales = alumnos.filter((a) => cuotas[a.id!]?.estado === "parcial").length;
@@ -82,7 +119,6 @@ export function PanelCuotas({ alumnos }: Props) {
     return { pagados, parciales, deben, recaudado };
   }, [alumnos, cuotas]);
 
-  // Lista filtrada
   const alumnosFiltrados = useMemo(() => {
     return alumnos.filter((a) => {
       if (gradoFiltro && a.grado !== gradoFiltro) return false;
@@ -95,23 +131,22 @@ export function PanelCuotas({ alumnos }: Props) {
     });
   }, [alumnos, gradoFiltro, turnoFiltro, estadoFiltro, cuotas]);
 
-  // Nombre del mes en español
   const mesLabel = new Date(mes + "-15").toLocaleDateString("es-AR", {
     month: "long",
     year: "numeric",
   });
 
-  // Abre el modal
-  function abrirModal(alumno: Alumno) {
-    const cuota = cuotas[alumno.id!];
+  function abrirModal(alumno: Alumno, mesKey: string) {
+    const cuota = todosMeses[mesKey]?.[alumno.id!];
     setModalAlumno(alumno);
+    setMesModal(mesKey);
     setMontoPagado(cuota?.montoPagado?.toString() || "");
     setFormaPago(cuota?.formaPago || "efectivo");
     setNota(cuota?.nota || "");
   }
 
   async function handleRegistrarPago() {
-    if (!modalAlumno || !montoPagado) return;
+    if (!modalAlumno || !montoPagado || !mesModal) return;
     if (formaPago === "efectivo" && !nota.trim()) {
       toast.error("Para pagos en efectivo escribí una nota");
       return;
@@ -119,7 +154,7 @@ export function PanelCuotas({ alumnos }: Props) {
     setSavingPago(true);
     try {
       const montoAcordado = getMontoAcordado(modalAlumno);
-      await registrarPago(modalAlumno.id!, mes, {
+      await registrarPago(modalAlumno.id!, mesModal, {
         montoBase: CUOTA_BASE,
         montoAcordado,
         montoPagado: Number(montoPagado),
@@ -127,7 +162,10 @@ export function PanelCuotas({ alumnos }: Props) {
         registradoPor: user?.email || "admin",
         nota: nota.trim(),
       });
-      await cargarCuotas();
+      // Actualizar cache del mes modificado
+      const data = await getCuotasMes(mesModal);
+      setTodosMeses((prev) => ({ ...prev, [mesModal]: data }));
+      if (mesModal === mes) setCuotas(data);
       toast.success("✅ Pago registrado");
       setModalAlumno(null);
       setMontoPagado("");
@@ -139,6 +177,13 @@ export function PanelCuotas({ alumnos }: Props) {
       setSavingPago(false);
     }
   }
+
+  const mesModalLabel = mesModal
+    ? new Date(mesModal + "-15").toLocaleDateString("es-AR", {
+        month: "long",
+        year: "numeric",
+      })
+    : "";
 
   return (
     <div>
@@ -214,7 +259,9 @@ export function PanelCuotas({ alumnos }: Props) {
             <label className="block text-xs font-medium text-gray-600 mb-1">Estado</label>
             <select
               value={estadoFiltro}
-              onChange={(e) => setEstadoFiltro(e.target.value as "" | "pagado" | "parcial" | "debe")}
+              onChange={(e) =>
+                setEstadoFiltro(e.target.value as "" | "pagado" | "parcial" | "debe")
+              }
               className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
             >
               <option value="">Todos</option>
@@ -241,7 +288,7 @@ export function PanelCuotas({ alumnos }: Props) {
                   <th className="text-left py-3 px-3 text-gray-600 font-medium">Alumno</th>
                   <th className="text-left py-3 px-3 text-gray-600 font-medium">Grado</th>
                   <th className="text-left py-3 px-3 text-gray-600 font-medium">Monto</th>
-                  <th className="text-left py-3 px-3 text-gray-600 font-medium">Estado</th>
+                  <th className="text-left py-3 px-3 text-gray-600 font-medium">Estado {mesLabel}</th>
                   <th className="text-left py-3 px-3 text-gray-600 font-medium">Pagado</th>
                   <th className="text-left py-3 px-3 text-gray-600 font-medium">Forma</th>
                   <th className="py-3 px-3"></th>
@@ -255,11 +302,13 @@ export function PanelCuotas({ alumnos }: Props) {
                   const hermanos = getCantHermanos(alumno);
 
                   return (
-                    <tr key={alumno.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <tr
+                      key={alumno.id}
+                      onClick={() => abrirDetalle(alumno)}
+                      className="border-b border-gray-100 hover:bg-blue-50 cursor-pointer transition-colors"
+                    >
                       <td className="py-3 px-3">
-                        <p className="font-medium text-gray-800">
-                          {alumno.nombreCompleto}
-                        </p>
+                        <p className="font-medium text-gray-800">{alumno.nombreCompleto}</p>
                         {hermanos >= 2 && (
                           <span className="text-xs text-purple-600">
                             👨‍👩‍👧 {hermanos} hijos en la escuela
@@ -312,12 +361,9 @@ export function PanelCuotas({ alumnos }: Props) {
                           : "—"}
                       </td>
                       <td className="py-3 px-3">
-                        <button
-                          onClick={() => abrirModal(alumno)}
-                          className="text-blue-600 hover:text-blue-800 text-xs font-medium whitespace-nowrap"
-                        >
-                          {estado === "debe" ? "💰 Registrar" : "✏️ Editar"}
-                        </button>
+                        <span className="text-blue-500 text-xs font-medium whitespace-nowrap">
+                          Ver todos los meses →
+                        </span>
                       </td>
                     </tr>
                   );
@@ -328,14 +374,115 @@ export function PanelCuotas({ alumnos }: Props) {
         )}
       </Card>
 
-      {/* Modal registrar pago */}
+      {/* ——— MODAL DETALLE ALUMNO (todos los meses) ——— */}
+      {alumnoDetalle && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+
+            {/* Encabezado */}
+            <div className="flex items-start justify-between mb-5">
+              <div>
+                <h3 className="text-lg font-bold text-gray-800">
+                  {alumnoDetalle.nombreCompleto}
+                </h3>
+                <p className="text-sm text-gray-500">
+                  {alumnoDetalle.grado} —{" "}
+                  {alumnoDetalle.turno === "manana" ? "Mañana" : "Tarde"}
+                  {getCantHermanos(alumnoDetalle) >= 2 && (
+                    <span className="ml-2 text-purple-600">
+                      👨‍👩‍👧 {getCantHermanos(alumnoDetalle)} hijos · descuento aplicado
+                    </span>
+                  )}
+                </p>
+              </div>
+              <button
+                onClick={() => setAlumnoDetalle(null)}
+                className="text-gray-400 hover:text-gray-600 text-2xl font-bold leading-none"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Lista de meses */}
+            {loadingDetalle ? (
+              <p className="text-gray-400 text-center py-10">Cargando historial...</p>
+            ) : (
+              <div className="space-y-2">
+                {MESES_2026.map(({ key, label }) => {
+                  const cuota = todosMeses[key]?.[alumnoDetalle.id!];
+                  const estado = cuota?.estado || "debe";
+                  const montoAcordado = getMontoAcordado(alumnoDetalle);
+
+                  return (
+                    <div
+                      key={key}
+                      className="flex items-center justify-between p-3 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <span className="text-sm font-semibold text-gray-700 w-24">
+                          {label}
+                        </span>
+
+                        {estado === "pagado" && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                            ✅ Pagó
+                          </span>
+                        )}
+                        {estado === "parcial" && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">
+                            ⚠️ Parcial
+                          </span>
+                        )}
+                        {estado === "debe" && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                            ❌ Pendiente
+                          </span>
+                        )}
+
+                        {cuota?.montoPagado ? (
+                          <span className="text-xs text-gray-500">
+                            ${cuota.montoPagado.toLocaleString("es-AR")}
+                            {cuota.formaPago === "efectivo" ? " 💵" : " 💳"}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-gray-400">
+                            ${montoAcordado.toLocaleString("es-AR")}
+                          </span>
+                        )}
+
+                        {estado === "parcial" && cuota && (
+                          <span className="text-xs text-red-500">
+                            Falta: ${(montoAcordado - cuota.montoPagado).toLocaleString("es-AR")}
+                          </span>
+                        )}
+                      </div>
+
+                      <button
+                        onClick={() => {
+                          setAlumnoDetalle(null);
+                          abrirModal(alumnoDetalle, key);
+                        }}
+                        className="text-xs font-medium text-blue-600 hover:text-blue-800 whitespace-nowrap ml-2"
+                      >
+                        {estado === "debe" ? "💰 Registrar" : "✏️ Editar"}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ——— MODAL REGISTRAR PAGO ——— */}
       {modalAlumno && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
             <h3 className="text-lg font-bold text-gray-800 mb-1">Registrar pago</h3>
             <p className="text-sm text-gray-500 mb-5">
-               {modalAlumno.nombreCompleto}—{" "}
-              <span className="capitalize">{mesLabel}</span>
+              {modalAlumno.nombreCompleto} —{" "}
+              <span className="capitalize font-medium text-blue-600">{mesModalLabel}</span>
             </p>
 
             <div className="space-y-4">
@@ -356,9 +503,7 @@ export function PanelCuotas({ alumnos }: Props) {
                   Number(montoPagado) < getMontoAcordado(modalAlumno) && (
                     <p className="text-xs text-yellow-600 mt-1">
                       ⚠️ Pago incompleto — falta $
-                      {(
-                        getMontoAcordado(modalAlumno) - Number(montoPagado)
-                      ).toLocaleString("es-AR")}
+                      {(getMontoAcordado(modalAlumno) - Number(montoPagado)).toLocaleString("es-AR")}
                     </p>
                   )}
                 {montoPagado && Number(montoPagado) >= getMontoAcordado(modalAlumno) && (
