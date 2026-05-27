@@ -199,7 +199,7 @@ export function PanelCuotas({ alumnos }: Props) {
             type="month"
             value={mes}
             onChange={(e) => setMes(e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white text-gray-900"
           />
         </div>
       </div>
@@ -234,7 +234,7 @@ export function PanelCuotas({ alumnos }: Props) {
             <select
               value={gradoFiltro}
               onChange={(e) => setGradoFiltro(e.target.value as Grado | "")}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white text-gray-900"
             >
               <option value="">Todos</option>
               {GRADOS.map((g) => (
@@ -247,7 +247,7 @@ export function PanelCuotas({ alumnos }: Props) {
             <select
               value={turnoFiltro}
               onChange={(e) => setTurnoFiltro(e.target.value as Turno | "")}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white text-gray-900"
             >
               <option value="">Todos</option>
               {TURNOS.map((t) => (
@@ -262,7 +262,7 @@ export function PanelCuotas({ alumnos }: Props) {
               onChange={(e) =>
                 setEstadoFiltro(e.target.value as "" | "pagado" | "parcial" | "debe")
               }
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white text-gray-900"
             >
               <option value="">Todos</option>
               <option value="pagado">✅ Pagaron</option>
@@ -496,7 +496,7 @@ export function PanelCuotas({ alumnos }: Props) {
                   value={montoPagado}
                   onChange={(e) => setMontoPagado(e.target.value)}
                   placeholder={`Cuota: $${getMontoAcordado(modalAlumno).toLocaleString("es-AR")}`}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white text-gray-900"
                 />
                 {montoPagado &&
                   Number(montoPagado) > 0 &&
@@ -557,7 +557,7 @@ export function PanelCuotas({ alumnos }: Props) {
                       : "Opcional — número de transacción, etc."
                   }
                   rows={2}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm resize-none"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm resize-none bg-white text-gray-900"
                 />
               </div>
             </div>
