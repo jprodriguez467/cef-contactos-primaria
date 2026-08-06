@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import {
   getCuotasMes,
   registrarPago,
+  anularPago,
   type Cuota,
   type FormaPago,
 } from "@/lib/firestore-cuotas";
@@ -58,6 +59,7 @@ export function PanelCuotas({ alumnos }: Props) {
   const [formaPago, setFormaPago] = useState<FormaPago>("efectivo");
   const [nota, setNota] = useState("");
   const [savingPago, setSavingPago] = useState(false);
+  const [anulando, setAnulando] = useState(false);
 
   // Filtros
   const [gradoFiltro, setGradoFiltro] = useState<Grado | "">("");
@@ -184,6 +186,44 @@ export function PanelCuotas({ alumnos }: Props) {
         year: "numeric",
       })
     : "";
+
+  // Cuota actualmente abierta en el modal de pago
+  const cuotaActual =
+    modalAlumno && mesModal ? todosMeses[mesModal]?.[modalAlumno.id!] : undefined;
+  const tienePagoRegistrado =
+    cuotaActual?.estado === "pagado" || cuotaActual?.estado === "parcial";
+
+  async function handleAnularPago() {
+    if (!modalAlumno || !mesModal || !cuotaActual) return;
+    const ok = window.confirm(
+      `¿Anular el pago de ${mesModalLabel} de ${modalAlumno.nombreCompleto}?\n\n` +
+        `Monto registrado: $${(cuotaActual.montoPagado || 0).toLocaleString("es-AR")}\n\n` +
+        `El mes volverá a figurar como pendiente.`
+    );
+    if (!ok) return;
+
+    setAnulando(true);
+    try {
+      await anularPago(modalAlumno.id!, mesModal, {
+        montoBase: CUOTA_BASE,
+        montoAcordado: getMontoAcordado(modalAlumno),
+        montoAnulado: cuotaActual.montoPagado || 0,
+        anuladoPor: user?.email || "admin",
+      });
+      const data = await getCuotasMes(mesModal);
+      setTodosMeses((prev) => ({ ...prev, [mesModal]: data }));
+      if (mesModal === mes) setCuotas(data);
+      toast.success("🗑️ Pago anulado");
+      setModalAlumno(null);
+      setMontoPagado("");
+      setNota("");
+      setFormaPago("efectivo");
+    } catch {
+      toast.error("Error al anular el pago");
+    } finally {
+      setAnulando(false);
+    }
+  }
 
   return (
     <div>
@@ -478,8 +518,10 @@ export function PanelCuotas({ alumnos }: Props) {
       {/* ——— MODAL REGISTRAR PAGO ——— */}
       {modalAlumno && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
-            <h3 className="text-lg font-bold text-gray-800 mb-1">Registrar pago</h3>
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-bold text-gray-800 mb-1">
+              {tienePagoRegistrado ? "Editar pago" : "Registrar pago"}
+            </h3>
             <p className="text-sm text-gray-500 mb-5">
               {modalAlumno.nombreCompleto} —{" "}
               <span className="capitalize font-medium text-blue-600">{mesModalLabel}</span>
@@ -583,6 +625,22 @@ export function PanelCuotas({ alumnos }: Props) {
                 Cancelar
               </Button>
             </div>
+
+            {/* Anular pago — solo si el mes ya tiene pago registrado */}
+            {tienePagoRegistrado && (
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <button
+                  onClick={handleAnularPago}
+                  disabled={anulando}
+                  className="w-full py-2 rounded-lg border border-red-300 text-red-600 text-sm font-medium hover:bg-red-50 transition-colors disabled:opacity-50"
+                >
+                  {anulando ? "Anulando..." : "🗑️ Anular pago de este mes"}
+                </button>
+                <p className="text-xs text-gray-400 text-center mt-2">
+                  El mes vuelve a figurar como pendiente
+                </p>
+              </div>
+            )}
           </div>
         </div>
       )}

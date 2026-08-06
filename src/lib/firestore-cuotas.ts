@@ -71,3 +71,37 @@ export async function registrarPago(
     timestamp: serverTimestamp(),
   });
 }
+export async function anularPago(
+  alumnoId: string,
+  mes: string,
+  data: {
+    montoBase: number;
+    montoAcordado: number;
+    montoAnulado: number;
+    anuladoPor: string;
+  }
+) {
+  // Vuelve el mes a "debe" sin borrar el documento
+  const ref = doc(db(), "cuotas", mes, "alumnos", alumnoId);
+  await setDoc(ref, {
+    alumnoId,
+    mes,
+    estado: "debe" as EstadoCuota,
+    montoBase: data.montoBase,
+    montoAcordado: data.montoAcordado,
+    montoPagado: 0,
+    nota: "",
+    registradoPor: data.anuladoPor,
+    fechaAnulacion: serverTimestamp(),
+  });
+
+  // Registro de auditoría
+  await addDoc(collection(db(), "auditoria"), {
+    accion: "anular_pago",
+    alumnoId,
+    mes,
+    montoAnulado: data.montoAnulado,
+    anuladoPor: data.anuladoPor,
+    timestamp: serverTimestamp(),
+  });
+}
